@@ -7,28 +7,55 @@ extends Node2D
 
 const BASE_SIZE = Vector2(600.0, 400.0)
 var current_size = BASE_SIZE
-var cell_num = Vector2(120, 80) # 30 20
 
+# settings
+var rainbow_trace = false
+var trace_length = 30
+
+# defaults
+var cell_num = Vector2(60, 40)
 var simulation_active = false
 var particle_direction = Vector2.RIGHT
 var particle_speed = 200
 
-var cell_array = null
+var rainbow_colors = [
+	Color(0.95, 0.05, 0.35),
+	Color(1.00, 0.61, 0.00),
+	Color(0.96, 0.84, 0.01),
+	Color(0.01, 0.78, 0.01),
+	Color(0.00, 0.55, 0.80),
+	Color(0.46, 0.16, 0.88)
+]
 
+
+# variables
+var cell_array = null
+var trace_points = []
 var total_distance = 0
+
+# other nodes
 onready var uncertainty_block = get_node("/root/Main/VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control/UncertaintyBlock")
 onready var statistics_label = get_node("/root/Main/VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control/StatisticsBlock/StatisticsLabel")
+onready var side_bar = get_node("/root/Main/VBoxContainer/HBoxContainer/SideBar")
+onready var settings = get_node("/root/Main/SettingsPanel")
+
 onready var particle = $Particle
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	yield(owner, "ready")
 	randomize()
+	load_settings()
 	adjust_size()
 	reset()
 
+func load_settings():
+	rainbow_trace = settings.get("rainbow_trace")
+
 func reset():
-	trace_points = [particle.position]
+	simulation_active = false
+	side_bar.set_mode('prepare')
+	trace_points = []
 	uncertainty_block.reset()
 	distance_went = 0
 	total_distance = 0
@@ -88,23 +115,28 @@ func draw_cells():
 			Color(0.8, 0.8, 0.8),
 			1.0
 		)
-	# ftame
-	draw_rect(Rect2(Vector2.ZERO, BASE_SIZE), Color(0.0, 0.0, 0.0), false, 4.0)
+	# frame
+	#draw_rect(Rect2(Vector2.ZERO, BASE_SIZE), Color(0.0, 0.0, 0.0), false, 4.0)
 
 func draw_trace():
 	if len(trace_points) == 0:
 		return
+	var color = Color(0.8, 0.2, 0.2)
 	for i in range(len(trace_points) - 1):
+		if rainbow_trace:
+			color = rainbow_colors[(len(trace_points) - i - 1) % 6]
 		draw_line(
 			Vector2(trace_points[i]),
 			Vector2(trace_points[i + 1]),
-			Color(0.8, 0.2, 0.2),
+			color,
 			2.0
 		)
+	if rainbow_trace:
+		color = rainbow_colors[0]
 	draw_line(
 			Vector2(trace_points[len(trace_points) - 1]),
 			Vector2(particle.position),
-			Color(0.8, 0.2, 0.2),
+			color,
 			2.0
 		)
 
@@ -113,6 +145,9 @@ func _draw():
 	draw_trace()
 
 func start_simulation():
+	if len(trace_points) == 0:
+		trace_points = [particle.position]
+	side_bar.set_mode('simulation')
 	if distance_went == 0:
 		generate_speed()
 	self.simulation_active = true
@@ -133,8 +168,6 @@ func stop_simulation():
 
 var distance_went = 0
 var jump_distance = 0
-var trace_length = 5
-var trace_points = []
 
 func _process(delta):
 	if simulation_active:
@@ -142,7 +175,7 @@ func _process(delta):
 			distance_went = 0
 			generate_speed()
 			
-			if trace_length > 0:
+			if trace_length > 0 and simulation_active:
 				trace_points.append(particle.position)
 				
 				while trace_length < len(trace_points):
@@ -214,3 +247,12 @@ func _input(event):
 
 func set_speed(value):
 	particle_speed = value
+
+func set_cell_size(value):
+	if value == 'S':
+		cell_num = Vector2(120, 80)
+	elif value == 'M':
+		cell_num = Vector2(60, 40)
+	elif value == 'L':
+		cell_num = Vector2(30, 20)
+	reset()

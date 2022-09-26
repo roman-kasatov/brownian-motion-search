@@ -1,9 +1,12 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://scenes/ParticleBlock.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scripts/UncertaintyBlock.gd" type="Script" id=3]
 [ext_resource path="res://scripts/StatisticsLabel.gd" type="Script" id=4]
+[ext_resource path="res://logical_resources/cell_size_buttongroup.tres" type="ButtonGroup" id=5]
+[ext_resource path="res://scripts/SideBar.gd" type="Script" id=6]
+[ext_resource path="res://scripts/SettingsPanel.gd" type="Script" id=7]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.152941, 0.152941, 0.152941, 1 )
@@ -58,6 +61,12 @@ margin_right = 94.0
 margin_bottom = 50.0
 text = "Help"
 
+[node name="Button3" type="Button" parent="VBoxContainer/TopBar/HBoxContainer"]
+margin_left = 98.0
+margin_right = 161.0
+margin_bottom = 50.0
+text = "Settings"
+
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 50.0
 margin_right = 1024.0
@@ -69,6 +78,7 @@ margin_right = 300.0
 margin_bottom = 550.0
 rect_min_size = Vector2( 300, 0 )
 custom_styles/panel = SubResource( 2 )
+script = ExtResource( 6 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar"]
 anchor_right = 1.0
@@ -80,6 +90,39 @@ margin_bottom = 246.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer"]
+margin_top = 178.0
+margin_right = 300.0
+margin_bottom = 202.0
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_top = 5.0
+margin_right = 54.0
+margin_bottom = 19.0
+text = "Cell size"
+
+[node name="CheckBox" type="CheckBox" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 58.0
+margin_right = 93.0
+margin_bottom = 24.0
+group = ExtResource( 5 )
+text = "S"
+
+[node name="CheckBox2" type="CheckBox" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 97.0
+margin_right = 137.0
+margin_bottom = 24.0
+pressed = true
+group = ExtResource( 5 )
+text = "M"
+
+[node name="CheckBox3" type="CheckBox" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 141.0
+margin_right = 176.0
+margin_bottom = 24.0
+group = ExtResource( 5 )
+text = "L"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer"]
 margin_top = 206.0
@@ -98,7 +141,7 @@ margin_right = 300.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 min_value = 100.0
-max_value = 1201.0
+max_value = 2001.0
 value = 200.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer"]
@@ -206,7 +249,7 @@ margin_bottom = -5.0
 
 [node name="ParticleBlock" parent="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control" instance=ExtResource( 2 )]
 
-[node name="HelpDimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="."]
 visible = false
 modulate = Color( 0, 0, 0, 0.768627 )
 anchor_right = 1.0
@@ -253,8 +296,84 @@ margin_left = 20.0
 margin_right = -20.0
 text = "OK"
 
+[node name="SettingsPanel" type="Panel" parent="."]
+pause_mode = 2
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -76.5
+margin_top = -70.0
+margin_right = 76.5
+margin_bottom = 70.0
+custom_styles/panel = SubResource( 3 )
+script = ExtResource( 7 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+
+[node name="Label" type="Label" parent="SettingsPanel/VBoxContainer"]
+margin_top = 5.0
+margin_right = 133.0
+margin_bottom = 36.0
+size_flags_vertical = 6
+text = "Settings Panel
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/VBoxContainer"]
+margin_top = 45.0
+margin_right = 133.0
+margin_bottom = 86.0
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/VBoxContainer"]
+margin_right = 133.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="SettingsPanel/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_top = 5.0
+margin_right = 89.0
+margin_bottom = 19.0
+text = "Rainbow trace"
+
+[node name="CheckBox" type="CheckBox" parent="SettingsPanel/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 93.0
+margin_right = 117.0
+margin_bottom = 24.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer"]
+margin_top = 90.0
+margin_right = 133.0
+margin_bottom = 120.0
+rect_min_size = Vector2( 0, 30 )
+custom_constants/separation = 20
+alignment = 1
+
+[node name="Button" type="Button" parent="SettingsPanel/VBoxContainer/HBoxContainer"]
+margin_right = 56.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+text = "Reset"
+
+[node name="Button2" type="Button" parent="SettingsPanel/VBoxContainer/HBoxContainer"]
+margin_left = 76.0
+margin_right = 133.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+text = "Save"
+
 [connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button" to="." method="reload_scene"]
 [connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button2" to="." method="toggle_help" binds= [ true ]]
+[connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button3" to="." method="toggle_settings" binds= [ true ]]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "S" ]]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox2" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "M" ]]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox3" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "L" ]]
 [connection signal="value_changed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer2/HSlider" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_speed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer/Button3" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="reset"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer/Button2" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="stop_simulation"]
@@ -263,3 +382,6 @@ text = "OK"
 [connection signal="toggled" from="VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control/StatisticsBlock/CheckBox" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control/StatisticsBlock/StatisticsLabel" method="_on_precise_toggled"]
 [connection signal="resized" from="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="adjust_size"]
 [connection signal="pressed" from="HelpPanel/VBoxContainer/Control/Button" to="." method="toggle_help" binds= [ false ]]
+[connection signal="toggled" from="SettingsPanel/VBoxContainer/VBoxContainer/HBoxContainer/CheckBox" to="SettingsPanel" method="set" binds= [ "rainbow_trace" ]]
+[connection signal="pressed" from="SettingsPanel/VBoxContainer/HBoxContainer/Button" to="SettingsPanel" method="load_settings"]
+[connection signal="pressed" from="SettingsPanel/VBoxContainer/HBoxContainer/Button2" to="." method="toggle_settings" binds= [ false ]]

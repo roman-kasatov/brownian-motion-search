@@ -17,9 +17,19 @@ func reload_scene():
 func toggle_help(turn_on):
 	if turn_on:
 		$HelpPanel.visible = true
-		$HelpDimmer.visible = true
+		$Dimmer.visible = true
 		get_tree().paused = true
 	else:
 		$HelpPanel.visible = false
-		$HelpDimmer.visible = false
+		$Dimmer.visible = false
+		get_tree().paused = false
+
+func toggle_settings(turn_on):
+	if turn_on:
+		$SettingsPanel.visible = true
+		$Dimmer.visible = true
+		get_tree().paused = true
+	else:
+		$SettingsPanel.visible = false
+		$Dimmer.visible = false
 		get_tree().paused = false
