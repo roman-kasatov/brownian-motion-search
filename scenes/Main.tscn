@@ -91,6 +91,24 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 2
 
+[node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer"]
+margin_top = 150.0
+margin_right = 300.0
+margin_bottom = 174.0
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_top = 5.0
+margin_right = 78.0
+margin_bottom = 19.0
+text = "Trace length"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 82.0
+margin_right = 156.0
+margin_bottom = 24.0
+max_value = 40.0
+value = 10.0
+
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer"]
 margin_top = 178.0
 margin_right = 300.0
@@ -371,6 +389,7 @@ text = "Save"
 [connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button" to="." method="reload_scene"]
 [connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button2" to="." method="toggle_help" binds= [ true ]]
 [connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/Button3" to="." method="toggle_settings" binds= [ true ]]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer4/SpinBox" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_trace_length"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "S" ]]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox2" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "M" ]]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SideBar/VBoxContainer/VBoxContainer/HBoxContainer3/CheckBox3" to="VBoxContainer/HBoxContainer/VBoxContainer/Panel2/Control/ParticleBlock" method="set_cell_size" binds= [ "L" ]]

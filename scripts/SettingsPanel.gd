@@ -19,7 +19,6 @@ func load_settings():
 		settings[key] = default_settings[key]
 	
 	$VBoxContainer/VBoxContainer/HBoxContainer/CheckBox.pressed = settings['rainbow_trace']
-	print(settings['rainbow_trace'])
 
 func get(key):
 	if not settings_loaded:

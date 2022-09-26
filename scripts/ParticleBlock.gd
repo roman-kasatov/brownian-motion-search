@@ -10,9 +10,9 @@ var current_size = BASE_SIZE
 
 # settings
 var rainbow_trace = false
-var trace_length = 30
 
 # defaults
+var trace_length = 10
 var cell_num = Vector2(60, 40)
 var simulation_active = false
 var particle_direction = Vector2.RIGHT
@@ -64,6 +64,10 @@ func reset():
 		cell_array.append([])
 		for _j in range(cell_num.y):
 			cell_array[i].append(0)
+	
+	statistics_label.distance = total_distance
+	statistics_label.update()
+	update()
 
 func adjust_size():
 	var parent_size = get_parent().rect_size
@@ -157,12 +161,14 @@ func generate_speed():
 	var angle = randf() * 2 * PI
 	particle_direction = Vector2(cos(angle), sin(angle))
 	
-	if randf() < 0.01:
+	if randf() < 0.00:
 		jump_distance = 100
 	else:
-		jump_distance = 10
+		jump_distance = 200
 
 func stop_simulation():
+	if trace_length > 0 and simulation_active:
+		trace_points.append(particle.position)
 	self.simulation_active = false
 
 
@@ -171,40 +177,94 @@ var jump_distance = 0
 
 func _process(delta):
 	if simulation_active:
-		if distance_went >= jump_distance:
-			distance_went = 0
-			generate_speed()
-			
-			if trace_length > 0 and simulation_active:
-				trace_points.append(particle.position)
-				
-				while trace_length < len(trace_points):
-					trace_points.remove(0)
+		move_particle(particle_speed * delta)
 
-		var step = particle_direction * particle_speed * delta
-		particle.position += step
-		distance_went += step.length()
-		total_distance += step.length()
-
-		if particle.position.x < 0:
-			particle.position.x = 0
-			particle_direction.x = -particle_direction.x
-		if particle.position.x > BASE_SIZE.x:
-			particle.position.x = BASE_SIZE.x - 0.0001
-			particle_direction.x = -particle_direction.x
-		if particle.position.y < 0:
-			particle.position.y = 0
-			particle_direction.y = - particle_direction.y
-		if particle.position.y > BASE_SIZE.y:
-			particle.position.y = BASE_SIZE.y - 0.0001
-			particle_direction.y = - particle_direction.y
+func move_particle(step_length):
+		# set direction
+	if distance_went >= jump_distance:
+		distance_went = 0
+		generate_speed()
 		
-		var i = floor(particle.position.x / (BASE_SIZE.x / cell_num.x))
-		var j = floor(particle.position.y / (BASE_SIZE.y / cell_num.y))
+		if trace_length > 0 and simulation_active:
+			trace_points.append(particle.position)
+			
+			while trace_length < len(trace_points):
+				trace_points.remove(0)
 
-		if cell_array[i][j] == 0:
-			cell_array[i][j] = 1
-			uncertainty_block.decrease_uncertainty(total_distance, 1.0 / cell_num.x / cell_num.y)
+	# make step
+	var step = particle_direction * step_length
+	particle.position += step
+	distance_went += step.length()
+	total_distance += step.length()
+
+	var bounce_flag = false
+	if particle.position.x < 0:
+		bounce_flag = true
+		particle.position.x = 0.0001
+		particle_direction.x = -particle_direction.x
+	if particle.position.x > BASE_SIZE.x:
+		bounce_flag = true
+		particle.position.x = BASE_SIZE.x - 0.0001
+		particle_direction.x = -particle_direction.x
+	if particle.position.y < 0:
+		bounce_flag = true
+		particle.position.y = 0.0001
+		particle_direction.y = - particle_direction.y
+	if particle.position.y > BASE_SIZE.y:
+		bounce_flag = true
+		particle.position.y = BASE_SIZE.y - 0.0001
+		particle_direction.y = - particle_direction.y
+	
+	if bounce_flag:
+		if trace_length > 0 and simulation_active:
+			trace_points.append(particle.position)
+			
+			while trace_length < len(trace_points):
+				trace_points.remove(0)
+
+	# mark visited cells
+
+	var start_point = particle.position - step
+	var end_point = particle.position
+	var cell_size = (0.0 + BASE_SIZE.x) / cell_num.x
+
+	if start_point.x > end_point.x:
+		var tmp = start_point
+		start_point = end_point
+		end_point = tmp
+
+	var new_cells_found = 0.0
+	var min_cell_x = ceil(start_point.x / cell_size)
+	var max_cell_x = ceil(end_point.x / cell_size)
+	for cell_x in range(min_cell_x, max_cell_x):
+		var x = cell_x * cell_size
+		var cell_y = floor(lerp(start_point.y, end_point.y, (x - start_point.x) / (end_point.x - start_point.x)) / cell_size)
+		if cell_array[cell_x][cell_y] == 0:
+			cell_array[cell_x][cell_y] = 1
+			new_cells_found += 1
+		if cell_array[cell_x - 1][cell_y] == 0:
+			cell_array[cell_x - 1][cell_y] = 1
+			new_cells_found += 1
+
+	if start_point.y > end_point.y:
+		var tmp = start_point
+		start_point = end_point
+		end_point = tmp
+
+	var min_cell_y = ceil(start_point.y / cell_size)
+	var max_cell_y = ceil(end_point.y / cell_size)
+	for cell_y in range(min_cell_y, max_cell_y):
+		var y = cell_y * cell_size
+		var cell_x = floor(lerp(start_point.x, end_point.x, (y - start_point.y) / (end_point.y - start_point.y)) / cell_size)
+		if cell_array[cell_x][cell_y] == 0:
+			cell_array[cell_x][cell_y] = 1
+			new_cells_found += 1
+		if cell_array[cell_x][cell_y - 1] == 0:
+			cell_array[cell_x][cell_y - 1] = 1
+			new_cells_found += 1
+		
+		if new_cells_found > 0:
+			uncertainty_block.decrease_uncertainty(total_distance, new_cells_found / cell_num.x / cell_num.y)
 		else:
 			uncertainty_block.update_distance(total_distance)
 
@@ -247,6 +307,9 @@ func _input(event):
 
 func set_speed(value):
 	particle_speed = value
+
+func set_trace_length(value):
+	trace_length = value
 
 func set_cell_size(value):
 	if value == 'S':
