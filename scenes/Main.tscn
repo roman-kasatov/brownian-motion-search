@@ -215,11 +215,6 @@ margin_bottom = -5.0
 [node name="UncertaintyBlock" type="Node2D" parent="VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control"]
 script = ExtResource( 3 )
 
-[node name="Line2D" type="Line2D" parent="VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control/UncertaintyBlock"]
-points = PoolVector2Array( 0, 0, 100, 0 )
-width = 2.0
-default_color = Color( 0.764706, 0.0196078, 0.0196078, 1 )
-
 [node name="StatisticsBlock" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer/Panel/Control"]
 anchor_top = 1.0
 anchor_bottom = 1.0

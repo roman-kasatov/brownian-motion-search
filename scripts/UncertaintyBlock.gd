@@ -10,23 +10,27 @@ onready var statistics_label = get_node("/root/Main/VBoxContainer/HBoxContainer/
 var current_size = Vector2()
 var vortex = [Vector2(0, 1)]
 var current_distance = 0
+var total_cells = 1
+var cells_left = 1
 
-func decrease_uncertainty(distance, step):
-	var current_uncertainty = vortex[-1].y - step
-	vortex.append(Vector2(distance, vortex[-1].y))
-	vortex.append(Vector2(distance, current_uncertainty))
+func update_entropy(distance, new_cells_found):
+	current_distance = distance
+	if new_cells_found > 0:
+		cells_left -= new_cells_found
+		var current_entropy = log(cells_left) / log(total_cells)
+		vortex.append(Vector2(distance, vortex[-1].y))
+		vortex.append(Vector2(distance, current_entropy))
+		
+		statistics_label.entropy = current_entropy
+		statistics_label.update()
 	update()
 
-	statistics_label.uncertainty = current_uncertainty
-	statistics_label.update()
 
 func reset():
+	cells_left = total_cells
 	vortex = [Vector2(0, 1)]
 	current_distance = 0
 
-func update_distance(distance):
-	current_distance = distance
-	update()
 
 func adjust_size():
 	var parent_size = get_parent().rect_size
@@ -41,7 +45,10 @@ func _ready():
 
 func _draw():
 	draw_rect(Rect2(Vector2.ZERO, current_size), Color(0.8, 0.8, 0.8), true)
-	var line_points = []
+	draw_chart()
+	
+func draw_chart():
+	var color = Color.red
 	var max_distance = vortex[-1].x
 	var add_tail = false
 
@@ -49,22 +56,56 @@ func _draw():
 		max_distance = current_distance
 		add_tail = true
 
-	if max_distance == 0:
+	if max_distance == 0: # ???
 		max_distance = 1
-	var min_uncertainty = vortex[-1].y
-	for v in vortex:
-		line_points.append(Vector2(
-			1.0 * v.x / max_distance * current_size.x,
-			1.0 * (1 - v.y) * current_size.y
-			)
+	
+	var chart_scale = Vector2(
+		current_size.x / max(1, current_distance),
+		current_size.y
+	)
+	
+	for i in range(len(vortex) - 1):
+		draw_line(
+			Vector2(
+				vortex[i].x,
+				1 - vortex[i].y
+			) * chart_scale,
+			Vector2(
+				vortex[i + 1].x,
+				1 - vortex[i + 1].y
+			) * chart_scale,
+			color,
+			2.0
 		)
-	if add_tail:
-		line_points.append(Vector2(
-			1.0 * current_distance / max_distance * current_size.x,
-			line_points[-1].y
-		))
-	$Line2D.points = line_points
 
+	if add_tail:
+		draw_line(
+			Vector2(
+				vortex[len(vortex) - 1].x,
+				1 - vortex[len(vortex) - 1].y
+			) * chart_scale,
+			Vector2(
+				current_distance,
+				1 - vortex[len(vortex) - 1].y
+			) * chart_scale,
+			color,
+			2.0
+		)
+#		line_points.append(Vector2(
+#			1.0 * current_distance / max_distance * current_size.x,
+#			line_points[-1].y
+#		))
+#	$Line2D.points = line_points
+#		var color = Color(0.8, 0.2, 0.2)
+#	for i in range(len(trace_points) - 1):
+#		if rainbow_trace:
+#			color = rainbow_colors[(len(trace_points) - i - 1) % 6]
+#		draw_line(
+#			Vector2(trace_points[i]),
+#			Vector2(trace_points[i + 1]),
+#			color,
+#			2.0
+#		)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

@@ -1,7 +1,7 @@
 extends Label
 
 var distance = 0
-var uncertainty = 1
+var entropy = 1
 var precise = false
 
 func _ready():
@@ -10,7 +10,7 @@ func _ready():
 func update():
 	var displayed_distance = distance
 	if precise:
-		text = "distance: %.1f, uncertainty: %.2f" % [displayed_distance, uncertainty]
+		text = "distance: %.1f, entropy: %.2f" % [displayed_distance, entropy]
 	else:
 		if distance > 1000:
 			displayed_distance = floor(distance / 100) * 100
@@ -18,7 +18,7 @@ func update():
 			displayed_distance = floor(distance / 10) * 10
 		else:
 			displayed_distance = distance
-		text = "distance: %d, uncertainty: %.2f" % [displayed_distance, uncertainty]
+		text = "distance: %d, entropy: %.2f" % [displayed_distance, entropy]
 
 
 func _on_precise_toggled(button_pressed):

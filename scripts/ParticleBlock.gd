@@ -56,7 +56,7 @@ func reset():
 	simulation_active = false
 	side_bar.set_mode('prepare')
 	trace_points = []
-	uncertainty_block.reset()
+
 	distance_went = 0
 	total_distance = 0
 	cell_array = []
@@ -65,8 +65,12 @@ func reset():
 		for _j in range(cell_num.y):
 			cell_array[i].append(0)
 	
+	uncertainty_block.total_cells = cell_num.x * cell_num.y
+	uncertainty_block.reset()
+
 	statistics_label.distance = total_distance
 	statistics_label.update()
+
 	update()
 
 func adjust_size():
@@ -262,14 +266,11 @@ func move_particle(step_length):
 		if cell_array[cell_x][cell_y - 1] == 0:
 			cell_array[cell_x][cell_y - 1] = 1
 			new_cells_found += 1
-		
-		if new_cells_found > 0:
-			uncertainty_block.decrease_uncertainty(total_distance, new_cells_found / cell_num.x / cell_num.y)
-		else:
-			uncertainty_block.update_distance(total_distance)
 
-		statistics_label.distance = total_distance
-		statistics_label.update()
+	uncertainty_block.update_entropy(total_distance, new_cells_found)
+
+	statistics_label.distance = total_distance
+	statistics_label.update()
 			
 	update()
 
@@ -317,5 +318,5 @@ func set_cell_size(value):
 	elif value == 'M':
 		cell_num = Vector2(60, 40)
 	elif value == 'L':
-		cell_num = Vector2(30, 20)
+		cell_num = Vector2(30, 20) # 30 20
 	reset()
