@@ -7,7 +7,7 @@ extends Node2D
 
 const BASE_SIZE = Vector2(600.0, 400.0)
 var current_size = BASE_SIZE
-var cell_num = Vector2(30, 20)
+var cell_num = Vector2(120, 80) # 30 20
 
 var simulation_active = false
 var particle_direction = Vector2.RIGHT
@@ -28,18 +28,19 @@ func _ready():
 	reset()
 
 func reset():
+	trace_points = [particle.position]
 	uncertainty_block.reset()
 	distance_went = 0
 	total_distance = 0
 	cell_array = []
 	for i in range(cell_num.x):
 		cell_array.append([])
-		for j in range(cell_num.y):
+		for _j in range(cell_num.y):
 			cell_array[i].append(0)
 
 func adjust_size():
 	var parent_size = get_parent().rect_size
-	var current_size = BASE_SIZE
+	current_size = BASE_SIZE
 	var base_ratio = BASE_SIZE.x / BASE_SIZE.y
 	if parent_size.x / parent_size.y > base_ratio:
 		current_size.y = parent_size.y
@@ -52,7 +53,7 @@ func adjust_size():
 	self.position = (parent_size - current_size) / 2
 
 func draw_cells():
-	draw_rect(Rect2(Vector2.ZERO, BASE_SIZE), Color(0.8, 0.8, 0.8), true)
+	draw_rect(Rect2(Vector2.ZERO, BASE_SIZE), Color(0.5, 0.5, 0.5), true)
 	for i in range(cell_num.x):
 		for j in range(cell_num.y):
 			if cell_array[i][j]:
@@ -67,7 +68,7 @@ func draw_cells():
 							BASE_SIZE.y / cell_num.y
 						)
 					),
-					Color(0.5, 0.4, 0.4),
+					Color(0.8, 0.8, 0.8),
 					true
 				)
 
@@ -76,7 +77,7 @@ func draw_cells():
 		draw_line(
 			Vector2(i * BASE_SIZE.x / cell_num.x, 0),
 			Vector2(i * BASE_SIZE.x / cell_num.x, BASE_SIZE.y),
-			Color(0.2, 0.2, 0.2),
+			Color(0.8, 0.8, 0.8),
 			1.0
 		)
 	# horizontal lines
@@ -84,14 +85,32 @@ func draw_cells():
 		draw_line(
 			Vector2(0, i * BASE_SIZE.y / cell_num.y),
 			Vector2(BASE_SIZE.x, i * BASE_SIZE.y / cell_num.y),
-			Color(0.2, 0.2, 0.2),
+			Color(0.8, 0.8, 0.8),
 			1.0
 		)
 	# ftame
 	draw_rect(Rect2(Vector2.ZERO, BASE_SIZE), Color(0.0, 0.0, 0.0), false, 4.0)
 
+func draw_trace():
+	if len(trace_points) == 0:
+		return
+	for i in range(len(trace_points) - 1):
+		draw_line(
+			Vector2(trace_points[i]),
+			Vector2(trace_points[i + 1]),
+			Color(0.8, 0.2, 0.2),
+			2.0
+		)
+	draw_line(
+			Vector2(trace_points[len(trace_points) - 1]),
+			Vector2(particle.position),
+			Color(0.8, 0.2, 0.2),
+			2.0
+		)
+
 func _draw():
 	draw_cells()
+	draw_trace()
 
 func start_simulation():
 	if distance_went == 0:
@@ -102,18 +121,32 @@ func start_simulation():
 func generate_speed():
 	var angle = randf() * 2 * PI
 	particle_direction = Vector2(cos(angle), sin(angle))
-	jump_distance = 100
+	
+	if randf() < 0.01:
+		jump_distance = 100
+	else:
+		jump_distance = 10
 
 func stop_simulation():
 	self.simulation_active = false
 
+
 var distance_went = 0
 var jump_distance = 0
+var trace_length = 5
+var trace_points = []
+
 func _process(delta):
 	if simulation_active:
 		if distance_went >= jump_distance:
 			distance_went = 0
 			generate_speed()
+			
+			if trace_length > 0:
+				trace_points.append(particle.position)
+				
+				while trace_length < len(trace_points):
+					trace_points.remove(0)
 
 		var step = particle_direction * particle_speed * delta
 		particle.position += step
@@ -135,9 +168,6 @@ func _process(delta):
 		
 		var i = floor(particle.position.x / (BASE_SIZE.x / cell_num.x))
 		var j = floor(particle.position.y / (BASE_SIZE.y / cell_num.y))
-		
-		print(particle.position)
-		print(i, j)
 
 		if cell_array[i][j] == 0:
 			cell_array[i][j] = 1

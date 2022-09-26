@@ -30,14 +30,12 @@ func update_distance(distance):
 
 func adjust_size():
 	var parent_size = get_parent().rect_size
-	print(parent_size)
 	current_size = parent_size
 	update()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	yield(owner, "ready")
-	print(get_path())
 	adjust_size()
 
 
@@ -53,7 +51,6 @@ func _draw():
 
 	if max_distance == 0:
 		max_distance = 1
-	print(max_distance)
 	var min_uncertainty = vortex[-1].y
 	for v in vortex:
 		line_points.append(Vector2(
