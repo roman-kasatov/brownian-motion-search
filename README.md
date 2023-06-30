@@ -1,2 +1,14 @@
-# brownian-motion-search
-Random search optimization. Nice visual representation
+### brownian-motion-search
+Визуализация случайного поиска на плоскости в виде броуновского движения с помощью Godot Engine
+
+#### Настраиваемые параметры симуляции:
++ размер ячейки поля
++ длина прыжка частицы
++ скорость движения частицы
++ длина отображаемого следа
+
+#### Скриншоты
+<p>
+  <img src="screenshots/1.PNG" width="45%"/>
+  <img src="screenshots/2.PNG" width="45%"/>
+</p>
